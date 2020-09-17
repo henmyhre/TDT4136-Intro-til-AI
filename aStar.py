@@ -4,10 +4,10 @@ from Node import Node
 
 def a_star(board, start, end):
     """Based on A* pseudo-code from Medium'"""
-    closed_nodes = []
     open_nodes = []
+    closed_nodes = []
     start_node = Node(None, start)
-    start_node.h = get_distance_between_nodes(start_node.position, end)
+    start_node.h = get_distance_between_nodes(start_node.pos, end)
     open_nodes.append(start_node)
     end_node = Node(None, end)
 
@@ -19,29 +19,29 @@ def a_star(board, start, end):
             path = []
             current = current_node
             while current is not None:
-                path.append(current.position)
-                current = current.best_parent
+                path.append(current.pos)
+                current = current.lowest_cost_parent
             return path[::-1]
 
         # Generate children, they can be north, south, east or west of the parent
         children = []
-        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+        for new_pos in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
             # For moving diagonally [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-            node_position = (
-                current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+            node_pos = (
+                current_node.pos[0] + new_pos[0], current_node.pos[1] + new_pos[1])
 
             # It's a wall, cannot walk here
-            if board[node_position[0]][node_position[1]] == -1:
+            if board[node_pos[0]][node_pos[1]] == -1:
                 continue
 
-            # Create new child in this new position
-            new_node = Node(current_node, node_position)
+            # Create new child in this new pos
+            new_node = Node(current_node, node_pos)
             children.append(new_node)
 
         # Adds the child to the parents child-list
         for child in children:
             # The tile cost is the g cost of the current child, it is found on the board
-            tile_cost = board[child.position[0]][child.position[1]]
+            tile_cost = board[child.pos[0]][child.pos[1]]
 
             # Checks if the child has previously been created, and therefor is either in open or closed nodes
             # if it is, we rather look at the old version and update it
@@ -79,9 +79,9 @@ def get_distance_between_nodes(node_1, node_2):
 def attach_and_eval(child, parent, end, tile_cost):
     """Attaches a node to its best parent (so far)
     the child's g'value is computed based on parent, h independently"""
-    child.best_parent = parent
+    child.lowest_cost_parent = parent
     child.g = parent.g + tile_cost
-    child.h = get_distance_between_nodes(child.position, end)
+    child.h = get_distance_between_nodes(child.pos, end)
 
 
 def propagate_path_improvements(parent):
@@ -91,7 +91,7 @@ def propagate_path_improvements(parent):
     and propagated further to the children of the children"""
     for child in parent.children:
         if parent.g + 1 < child.g:
-            child.best_parent = parent
+            child.lowest_cost_parent = parent
             child.g = parent.g + 1
             propagate_path_improvements(child)
 
