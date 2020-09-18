@@ -3,35 +3,31 @@ from Node import Node
 
 """Based on A* pseudo-code from Medium'"""
 
-connected_nodes_directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-
 
 def a_star_search(map, start, end):
-    open_nodes = []
-    closed_nodes = []
     start_node = Node(None, start)
     start_node.h = abs(start_node.pos[0] - end[0]) + \
         abs(start_node.pos[1] - end[1])
+    open_nodes = []
+    closed_nodes = []
     open_nodes.append(start_node)
     end_node = Node(None, end)
 
     while open_nodes:
         current_node = open_nodes.pop(0)
         closed_nodes.append(current_node)
+        children = []
 
         if current_node == end_node:
             path = []
-            current = current_node
-            while current is not None:
-                path.append(current.pos)
-                current = current.lowest_cost_parent
+            while (current_node):
+                path.append(current_node.pos)
+                current_node = current_node.lowest_cost_parent
             return path[::-1]
 
-        children = []
-
-        for connected_node_direction in connected_nodes_directions:
+        for direction_to_connected_node in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             node_pos = (
-                current_node.pos[0] + connected_node_direction[0], current_node.pos[1] + connected_node_direction[1])
+                current_node.pos[0] + direction_to_connected_node[0], current_node.pos[1] + direction_to_connected_node[1])
             if map[node_pos[0]][node_pos[1]] != -1:
                 new_node = Node(current_node, node_pos)
                 children.append(new_node)
@@ -45,7 +41,7 @@ def a_star_search(map, start, end):
                 if closed_nodes[i] == child:
                     child = closed_nodes[i]
             current_node.children.append(child)
-            if child not in open_nodes and child not in closed_nodes:
+            if child not in closed_nodes and child not in open_nodes:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
                 open_nodes.append(child)
@@ -55,7 +51,6 @@ def a_star_search(map, start, end):
                     child, current_node, end, tile_cost)
                 if child in closed_nodes:
                     propagate_path_improvements(child)
-
     return False
 
 
