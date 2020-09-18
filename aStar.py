@@ -1,11 +1,12 @@
 import Map
 from Node import Node
 
+"""Based on A* pseudo-code from Medium'"""
+
 connected_nodes_directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
 
 def a_star_search(map, start, end):
-    """Based on A* pseudo-code from Medium'"""
     open_nodes = []
     closed_nodes = []
     start_node = Node(None, start)
@@ -25,48 +26,32 @@ def a_star_search(map, start, end):
                 path.append(current.pos)
                 current = current.lowest_cost_parent
             return path[::-1]
+
         children = []
-        for new_pos in connected_nodes_directions:
+
+        for connected_node_direction in connected_nodes_directions:
             node_pos = (
-                current_node.pos[0] + new_pos[0], current_node.pos[1] + new_pos[1])
+                current_node.pos[0] + connected_node_direction[0], current_node.pos[1] + connected_node_direction[1])
+            if map[node_pos[0]][node_pos[1]] != -1:
+                new_node = Node(current_node, node_pos)
+                children.append(new_node)
 
-            # It's a wall, cannot walk here
-            if map[node_pos[0]][node_pos[1]] == -1:
-                continue
-
-            # Create new child in this new pos
-            new_node = Node(current_node, node_pos)
-            children.append(new_node)
-
-        # Adds the child to the parents child-list
         for child in children:
-            # The tile cost is the g cost of the current child, it is found on the map
             tile_cost = map[child.pos[0]][child.pos[1]]
-
-            # Checks if the child has previously been created, and therefor is either in open or closed nodes
-            # if it is, we rather look at the old version and update it
             for i in range(len(open_nodes)):
                 if open_nodes[i] == child:
                     child = open_nodes[i]
-            for j in range(len(closed_nodes)):
-                if closed_nodes[j] == child:
-                    child = closed_nodes[j]
-
-            # appending the correct node to children list
+            for i in range(len(closed_nodes)):
+                if closed_nodes[i] == child:
+                    child = closed_nodes[i]
             current_node.children.append(child)
-
             if child not in open_nodes and child not in closed_nodes:
-                # It has not yet been evaluated, and we don't need to propagate it
-                create_parent_child_relation(
+                create_parent_relation(
                     child, current_node, end, tile_cost)
                 open_nodes.append(child)
                 open_nodes.sort()
-
-            # (found cheaper path to the child):
             elif current_node.g + tile_cost < child.g:
-                # ∗ attach-and-eval(S,X)
-                # ∗ If S ∈ CLOSED then propagate-path-improvements(S)
-                create_parent_child_relation(
+                create_parent_relation(
                     child, current_node, end, tile_cost)
                 if child in closed_nodes:
                     propagate_path_improvements(child)
@@ -74,21 +59,21 @@ def a_star_search(map, start, end):
     return False
 
 
-def create_parent_child_relation(child, parent, end, tile_cost):
+def create_parent_relation(child, parent, end, tile_cost):
     child.lowest_cost_parent = parent
     child.g = parent.g + tile_cost
     child.h = abs(child.pos[0] - end[0]) + abs(child.pos[1] - end[1])
 
 
-def propagate_path_improvements(parent):
+def propagate_path_improvements(node):
     """Goes through the children and possibly many other decedents
     If parent is no longer their best parent, the propagation ceases,
     if any child can have parent as its best parent it must be updated
     and propagated further to the children of the children"""
-    for child in parent.children:
-        if parent.g + 1 < child.g:
-            child.lowest_cost_parent = parent
-            child.g = parent.g + 1
+    for child in node.children:
+        if node.g + 1 < child.g:
+            child.lowest_cost_parent = node
+            child.g = node.g + 1
             propagate_path_improvements(child)
 
 
