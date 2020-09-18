@@ -66,12 +66,8 @@ def create_parent_relation(child, parent, end, tile_cost):
 
 
 def propagate_path_improvements(node):
-    """Goes through the children and possibly many other decedents
-    If parent is no longer their best parent, the propagation ceases,
-    if any child can have parent as its best parent it must be updated
-    and propagated further to the children of the children"""
     for child in node.children:
-        if node.g + 1 < child.g:
+        if child.g > node.g + 1:
             child.lowest_cost_parent = node
             child.g = node.g + 1
             propagate_path_improvements(child)
