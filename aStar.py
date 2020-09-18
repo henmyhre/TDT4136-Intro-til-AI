@@ -4,8 +4,9 @@ from Node import Node
 
 def a_star_search(map, start, end):
     """
-    Based on A* pseudo-code from Medium:
+    Partly based on A* pseudo-code from Medium:
     https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
+    The differences is based on what I remembered from videos I watched. 
     """
     start_node = Node(None, start)
     start_node.h = abs(start_node.pos[0] - end[0]) + \
@@ -39,24 +40,23 @@ def a_star_search(map, start, end):
 
         """
     Goes through children nodes.
-    Checks if they aldready exists in open_list or closed_list to not use recreated nodes.
+    Skips if node is in closed_list.
+    Checks if they aldready exists in open_list to not use recreated nodes.
     Adds parent relation if node is 'new'.
     Replaces parent relation and iproves children cost if new parent is better than old.
     """
         for child in children:
             tile_cost = map[child.pos[0]][child.pos[1]]
             open_node = False
-            closed_node = False
+            for closed_child in closed_list:
+                if child == closed_child:
+                    continue
             for i in range(len(open_list)):
                 if open_list[i] == child:
                     child = open_list[i]
                     open_node = True
-            for i in range(len(closed_list)):
-                if closed_list[i] == child:
-                    child = closed_list[i]
-                    closed_node = True
             current_node.children.append(child)
-            if not open_node and not closed_node:
+            if not open_node:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
                 open_list.append(child)
