@@ -3,12 +3,8 @@ class Node:
         self.pos = pos
         self.children = []
         self.lowest_cost_parent = lowest_cost_parent
-
         self.g = 0
         self.h = 0
-
-    def get_total_cost(self):
-        return self.g + self.h
 
     def __eq__(self, other):
         return self.pos == other.pos
@@ -18,3 +14,6 @@ class Node:
 
     def __str__(self):
         return "Position: " + str(self.pos) + ". Total cost: " + str(self.get_total_cost())
+
+    def get_total_cost(self):
+        return self.g + self.h
