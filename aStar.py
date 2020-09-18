@@ -41,7 +41,7 @@ def a_star_search(map, start, end):
         """
     Goes through children nodes.
     Skips if node is in closed_list.
-    Checks if they aldready exists in open_list to not use recreated nodes.
+    Checks if they aldready exists in open_list to later add it if it does not already exist there.
     Adds parent relation if node is 'new'.
     Replaces parent relation and iproves children cost if new parent is better than old.
     """

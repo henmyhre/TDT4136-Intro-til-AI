@@ -6,10 +6,10 @@ class Node:
 
     def __init__(self, lowest_cost_parent=None, pos=None):
         self.pos = pos
-        self.children = []
-        self.lowest_cost_parent = lowest_cost_parent
         self.g = 0
         self.h = 0
+        self.children = []
+        self.lowest_cost_parent = lowest_cost_parent
 
     def __eq__(self, other):
         return self.pos == other.pos
