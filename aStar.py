@@ -48,14 +48,12 @@ def a_star_search(map, start, end):
         for child in children:
             tile_cost = map[child.pos[0]][child.pos[1]]
             open_node = False
-            for closed_child in closed_list:
-                if child == closed_child:
+            for node in closed_list:
+                if child == node:
                     continue
-            for i in range(len(open_list)):
-                if open_list[i] == child:
-                    child = open_list[i]
+            for node in open_list:
+                if child == node:
                     open_node = True
-            current_node.children.append(child)
             if not open_node:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
@@ -64,9 +62,6 @@ def a_star_search(map, start, end):
             elif current_node.g + tile_cost < child.g:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
-                if child in closed_list:
-                    improve_children_cost(child)
-
     return False
 
 
@@ -101,7 +96,9 @@ def main():
     while (True):
         n = -1
         while not (5 > n > 0):
-            n = int(input("Task number (1-4): "))
+            n = int(input("Task number (1-4) ('q' to stop): "))
+        if (n == 'q'):
+            break
         map = Map.Map_Obj(n)
         int_map, str_map = map.get_maps()
         map.show_map()
@@ -115,8 +112,6 @@ def main():
             add_path_to_map(map, path)
             int_map, str_map = map.get_maps()
             map.show_map()
-        if ('q' == input("'q' to quit: ")):
-            break
 
 
 main()
