@@ -10,15 +10,15 @@ def a_star_search(map, start, end):
     start_node = Node(None, start)
     start_node.h = abs(start_node.pos[0] - end[0]) + \
         abs(start_node.pos[1] - end[1])
-    open_nodes = []
-    closed_nodes = []
-    open_nodes.append(start_node)
+    open_list = []
+    closed_list = []
+    open_list.append(start_node)
     end_node = Node(None, end)
 
     """Code stops if no open nodes left"""
-    while open_nodes:
-        current_node = open_nodes.pop(0)
-        closed_nodes.append(current_node)
+    while open_list:
+        current_node = open_list.pop(0)
+        closed_list.append(current_node)
         children = []
 
         """Backtracking to calculate path when end node is reached"""
@@ -39,7 +39,7 @@ def a_star_search(map, start, end):
 
         """
     Goes through children nodes.
-    Checks if they aldready exists in open_nodes or closed_nodes to not use recreated nodes.
+    Checks if they aldready exists in open_list or closed_list to not use recreated nodes.
     Adds parent relation if node is 'new'.
     Replaces parent relation and iproves children cost if new parent is better than old.
     """
@@ -47,24 +47,24 @@ def a_star_search(map, start, end):
             tile_cost = map[child.pos[0]][child.pos[1]]
             open_node = False
             closed_node = False
-            for i in range(len(open_nodes)):
-                if open_nodes[i] == child:
-                    child = open_nodes[i]
+            for i in range(len(open_list)):
+                if open_list[i] == child:
+                    child = open_list[i]
                     open_node = True
-            for i in range(len(closed_nodes)):
-                if closed_nodes[i] == child:
-                    child = closed_nodes[i]
+            for i in range(len(closed_list)):
+                if closed_list[i] == child:
+                    child = closed_list[i]
                     closed_node = True
             current_node.children.append(child)
             if not open_node and not closed_node:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
-                open_nodes.append(child)
-                open_nodes.sort()
+                open_list.append(child)
+                open_list.sort()
             elif current_node.g + tile_cost < child.g:
                 create_parent_relation(
                     child, current_node, end, tile_cost)
-                if child in closed_nodes:
+                if child in closed_list:
                     improve_children_cost(child)
 
     return False
