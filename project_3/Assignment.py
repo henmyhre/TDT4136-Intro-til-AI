@@ -14,6 +14,10 @@ class CSP:
         # the variable pair (i, j)
         self.constraints = {}
 
+        # counts total backtracks and failed backtracks 
+        self.backtrackCount = 0
+        self.backtrackFailedCount = 0
+
     def add_variable(self, name, domain):
         """Add a new variable to the CSP. 'name' is the variable name
         and 'domain' is a list of the legal values for the variable.
@@ -109,7 +113,47 @@ class CSP:
         iterations of the loop.
         """
         # TODO: IMPLEMENT THIS
-        pass
+        # Counter for counting how many times backtrack is called
+        self.backtrackCount += 1
+
+        # Check if all the variables in 'assignment' have lists of length one
+        complete = True
+        for value in assignment:
+            if len(assignment[value]) != 1:
+                complete = False
+        if complete:
+            return assignment
+
+        # Function for selecting a variable with a domain size greater than 1
+        var = self.select_unassigned_variable(assignment)
+
+        # For each value of the possible values of var
+        for value in assignment[var]:
+            # Create a deep copy of assignment
+            assignment2 = copy.deepcopy(assignment)
+
+            # Adds var = value to the assignment
+            assignment2[var] = value
+
+            # Checks if value is consistent with assignment
+            if value in self.domains[var]:
+
+                # Calls AC-3 as inference to check for arc consistency
+                inferences = self.inference(assignment2, self.get_all_arcs())
+
+                # If the inference is not failure
+                if inferences:
+
+                    # Recursive call to backtrack with reevaluated assignment
+                    result = self.backtrack(assignment2)
+
+                    # Return the result if it is complete
+                    if result is not False:
+                        return result
+
+        # Counter for how many times the backtrackCount fails
+        self.backtrackFailedCount += 1
+        return False
 
     def select_unassigned_variable(self, assignment):
         """The function 'Select-Unassigned-Variable' from the pseudocode
@@ -118,7 +162,10 @@ class CSP:
         of legal values has a length greater than one.
         """
         # TODO: IMPLEMENT THIS
-        pass
+        # Returns a variable that has a domain size greater than one
+        for value in assignment:
+            if len(assignment[value]) > 1:
+                return value
 
     def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
@@ -127,7 +174,23 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: IMPLEMENT THIS
-        pass
+        while queue:
+            # Takes the first element of the queue and saves it as i and j
+            i, j = queue.pop(0)
+
+            # If the revise function changes anything
+            if self.revise(assignment, i, j):
+
+                # If the domain of i is empty the search has failed
+                if len(assignment[i]) == 0:
+                    return False
+
+                # Adds all neighbours of Xi except for Xj to the queue
+                for k in self.get_all_neighboring_arcs(i):
+                    if k == (i, j):
+                        continue
+                    queue.append(k)
+        return True
 
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
@@ -139,7 +202,26 @@ class CSP:
         legal values in 'assignment'.
         """
         # TODO: IMPLEMENT THIS
-        pass
+                # Revise function to check for arc consistency, and removes illegal values
+        revised = False
+        for x in assignment[i]:
+            satisfied = False
+
+            # The for loop check if there is a value y in Dj that satisfy the constraint
+            # between Xi and Xj
+            for y in assignment[j]:
+
+                # If (x, y) is in the constraints between Xi and Xj the constraint is
+                # satisfied and does not need to be changed
+                if (x, y) in self.constraints[i][j]:
+                    satisfied = True
+                    break
+            # If the constraint cannot be satisfied, remove the element causing
+            # inconsistency
+            if not satisfied:
+                revised = True
+                assignment[i].remove(x)
+        return revised
 
 
 def create_map_coloring_csp():
@@ -202,3 +284,11 @@ def print_sudoku_solution(solution):
         print("")
         if row == 2 or row == 5:
             print('------+-------+------')
+
+def main():
+    csp = create_map_coloring_csp()
+    sudoku = create_sudoku_csp("veryhard.txt")
+    print_sudoku_solution(sudoku.backtracking_search())
+    print("backtrack count: ", sudoku.backtrackCount)
+    print("backtrack failed count: ", sudoku.backtrackFailedCount)
+main()
