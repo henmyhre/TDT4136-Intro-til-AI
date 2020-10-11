@@ -114,28 +114,24 @@ class CSP:
         """
         # TODO: IMPLEMENT THIS
         self.backtrackCount += 1
-        # Check if all the variables in 'assignment' have lists of length one
-        # Returns assignment if one of the variables have a value-list > 1
-        complete = True
+        # Returns assignment if one of the variables have a value-list length > 1
+        done = True
         for variable in assignment:
             if len(assignment[variable]) > 1:
-                complete = False
-        if complete:
+                done = False
+        if done:
             return assignment
-        # Function for selecting a variable with a domain size greater than 1
+        # Find variable with size > 1 and iterate the values
         variable = self.select_unassigned_variable(assignment)
-        # For each value of the possible values of var
         for value in assignment[variable]:
-            # Create a deep copy of assignment
+            # Create a deep copy of assignment and adds value to variable
             assignment2 = copy.deepcopy(assignment)
-            # Adds var = value to the assignment
             assignment2[variable] = value
             # Checks if value is consistent with assignment
             if value in self.domains[variable]:
                 # Calls AC-3 as inference to check for arc consistency
-                inferences = self.inference(assignment2, self.get_all_arcs())
-                # If the inference is not failure
-                if inferences:
+                inference = self.inference(assignment2, self.get_all_arcs())
+                if inference:
                     # Recursive call to backtrack with reevaluated assignment
                     result = self.backtrack(assignment2)
                     # Return the result if it is complete
@@ -269,7 +265,7 @@ def print_sudoku_solution(solution):
 
 def main():
     csp = create_map_coloring_csp()
-    sudoku = create_sudoku_csp("easy.txt")
+    sudoku = create_sudoku_csp("veryhard.txt")
     print_sudoku_solution(sudoku.backtracking_search())
     print("backtrack count: ", sudoku.backtrackCount)
     print("backtrack failed count: ", sudoku.backtrackFailedCount)
