@@ -125,13 +125,13 @@ class CSP:
         variable = self.select_unassigned_variable(assignment)
         for value in assignment[variable]:
             # Create a deep copy of assignment and adds value to variable
-            assignment2 = copy.deepcopy(assignment)
-            assignment2[variable] = value
+            assignment_copy = copy.deepcopy(assignment)
+            assignment_copy[variable] = value
             if value in self.domains[variable]:
                 # Checking for arc consistency
-                inference = self.inference(assignment2, self.get_all_arcs())
+                inference = self.inference(assignment_copy, self.get_all_arcs())
                 if inference:
-                    result = self.backtrack(assignment2)
+                    result = self.backtrack(assignment_copy)
                     # Return result if complete
                     if result:
                         return result
