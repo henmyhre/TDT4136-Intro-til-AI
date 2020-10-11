@@ -127,15 +127,13 @@ class CSP:
             # Create a deep copy of assignment and adds value to variable
             assignment2 = copy.deepcopy(assignment)
             assignment2[variable] = value
-            # Checks if value is consistent with assignment
             if value in self.domains[variable]:
-                # Calls AC-3 as inference to check for arc consistency
+                # Checking for arc consistency
                 inference = self.inference(assignment2, self.get_all_arcs())
                 if inference:
-                    # Recursive call to backtrack with reevaluated assignment
                     result = self.backtrack(assignment2)
-                    # Return the result if it is complete
-                    if result != False:
+                    # Return result if complete
+                    if result:
                         return result
         self.backtrackFailedCount += 1
         return False
@@ -159,10 +157,9 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: IMPLEMENT THIS
+        # Until there are no more arcs that should be visited in queue
         while queue:
-            # Takes the first element of the queue and saves it as i and j
             i, j = queue.pop(0)
-            # If the revise function changes anything
             if self.revise(assignment, i, j):
                 # If the domain of i is empty the search has failed
                 if len(assignment[i]) == 0:
@@ -184,21 +181,17 @@ class CSP:
         legal values in 'assignment'.
         """
         # TODO: IMPLEMENT THIS
-                # Revise function to check for arc consistency, and removes illegal values
+        # Check arc consistency, and remove illegal values
         revised = False
         for x in assignment[i]:
-            satisfied = False
-            # The for loop check if there is a value y in Dj that satisfy the constraint
-            # between Xi and Xj
+            remove = True
+            # Check for value y that satisfy the constraint
             for y in assignment[j]:
-                # If (x, y) is in the constraints between Xi and Xj the constraint is
-                # satisfied and does not need to be changed
+                # The constraint is satisfied
                 if (x, y) in self.constraints[i][j]:
-                    satisfied = True
-                    break
-            # If the constraint cannot be satisfied, remove the element causing
-            # inconsistency
-            if not satisfied:
+                    remove = False
+            # Remove if constraint is not satisfied
+            if remove:
                 revised = True
                 assignment[i].remove(x)
         return revised
