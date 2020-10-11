@@ -113,9 +113,7 @@ class CSP:
         iterations of the loop.
         """
         # TODO: IMPLEMENT THIS
-        # Counter for counting how many times backtrack is called
         self.backtrackCount += 1
-
         # Check if all the variables in 'assignment' have lists of length one
         complete = True
         for value in assignment:
@@ -123,35 +121,25 @@ class CSP:
                 complete = False
         if complete:
             return assignment
-
         # Function for selecting a variable with a domain size greater than 1
         var = self.select_unassigned_variable(assignment)
-
         # For each value of the possible values of var
         for value in assignment[var]:
             # Create a deep copy of assignment
             assignment2 = copy.deepcopy(assignment)
-
             # Adds var = value to the assignment
             assignment2[var] = value
-
             # Checks if value is consistent with assignment
             if value in self.domains[var]:
-
                 # Calls AC-3 as inference to check for arc consistency
                 inferences = self.inference(assignment2, self.get_all_arcs())
-
                 # If the inference is not failure
                 if inferences:
-
                     # Recursive call to backtrack with reevaluated assignment
                     result = self.backtrack(assignment2)
-
                     # Return the result if it is complete
                     if result is not False:
                         return result
-
-        # Counter for how many times the backtrackCount fails
         self.backtrackFailedCount += 1
         return False
 
@@ -163,9 +151,9 @@ class CSP:
         """
         # TODO: IMPLEMENT THIS
         # Returns a variable that has a domain size greater than one
-        for value in assignment:
-            if len(assignment[value]) > 1:
-                return value
+        for variable in assignment:
+            if len(assignment[variable]) > 1:
+                return variable
 
     def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
@@ -177,14 +165,11 @@ class CSP:
         while queue:
             # Takes the first element of the queue and saves it as i and j
             i, j = queue.pop(0)
-
             # If the revise function changes anything
             if self.revise(assignment, i, j):
-
                 # If the domain of i is empty the search has failed
                 if len(assignment[i]) == 0:
                     return False
-
                 # Adds all neighbours of Xi except for Xj to the queue
                 for k in self.get_all_neighboring_arcs(i):
                     if k == (i, j):
@@ -206,11 +191,9 @@ class CSP:
         revised = False
         for x in assignment[i]:
             satisfied = False
-
             # The for loop check if there is a value y in Dj that satisfy the constraint
             # between Xi and Xj
             for y in assignment[j]:
-
                 # If (x, y) is in the constraints between Xi and Xj the constraint is
                 # satisfied and does not need to be changed
                 if (x, y) in self.constraints[i][j]:
