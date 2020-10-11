@@ -150,7 +150,7 @@ class CSP:
         of legal values has a length greater than one.
         """
         # TODO: IMPLEMENT THIS
-        # Returns a variable that has a domain size greater than one
+        # Finds variable with  a list of legal values greater than 1, and returns that.
         for variable in assignment:
             if len(assignment[variable]) > 1:
                 return variable
@@ -238,7 +238,6 @@ def create_sudoku_csp(filename):
                 csp.add_variable('%d-%d' % (row, col), list(map(str, range(1, 10))))
             else:
                 csp.add_variable('%d-%d' % (row, col), [board[row][col]])
-
     for row in range(9):
         csp.add_all_different_constraint(['%d-%d' % (row, col) for col in range(9)])
     for col in range(9):
@@ -250,7 +249,6 @@ def create_sudoku_csp(filename):
                 for col in range(box_col * 3, (box_col + 1) * 3):
                     cells.append('%d-%d' % (row, col))
             csp.add_all_different_constraint(cells)
-
     return csp
 
 
