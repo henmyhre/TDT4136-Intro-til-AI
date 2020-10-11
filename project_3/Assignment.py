@@ -159,16 +159,16 @@ class CSP:
         # TODO: IMPLEMENT THIS
         # Until there are no more arcs that should be visited in queue
         while queue:
-            i, j = queue.pop(0)
+            (i, j) = queue.pop(0)
             if self.revise(assignment, i, j):
-                # If the domain of i is empty the search has failed
+                # Search failed if empty
                 if len(assignment[i]) == 0:
                     return False
-                # Adds all neighbours of Xi except for Xj to the queue
-                for k in self.get_all_neighboring_arcs(i):
-                    if k == (i, j):
+                # Appends all neighboring arcs to queue
+                for arc in self.get_all_neighboring_arcs(i):
+                    if arc == (i, j):
                         continue
-                    queue.append(k)
+                    queue.append(arc)
         return True
 
     def revise(self, assignment, i, j):
