@@ -184,8 +184,8 @@ class CSP:
         # Check arc consistency, and remove illegal values
         revised = False
         for x in assignment[i]:
+            # Check for value y that satisfy the constraint and sets remove to True
             remove = True
-            # Check for value y that satisfy the constraint
             for y in assignment[j]:
                 # The constraint is satisfied
                 if (x, y) in self.constraints[i][j]:
