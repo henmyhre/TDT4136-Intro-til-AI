@@ -113,6 +113,7 @@ class CSP:
         iterations of the loop.
         """
         # TODO: IMPLEMENT THIS
+        self.backtrack_count += 1
         # Returns assignment if one of the variables have a value-list length > 1
         done = True
         for variable in assignment:
@@ -123,7 +124,6 @@ class CSP:
         # Find variable with size > 1 and iterate the values
         variable = self.select_unassigned_variable(assignment)
         for value in assignment[variable]:
-            self.backtrack_count += 1
             # Create a deep copy of assignment and adds value to variable
             assignment_copy = copy.deepcopy(assignment)
             assignment_copy[variable] = value
@@ -257,7 +257,7 @@ def print_sudoku_solution(solution):
 
 def main():
     csp = create_map_coloring_csp()
-    sudoku = create_sudoku_csp("veryhard.txt")
+    sudoku = create_sudoku_csp("easy.txt")
     print_sudoku_solution(sudoku.backtracking_search())
     print("backtrack count: ", sudoku.backtrack_count)
     print("backtrack failed count: ", sudoku.backtrack_failed_count)
