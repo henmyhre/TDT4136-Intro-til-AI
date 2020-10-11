@@ -14,10 +14,6 @@ class CSP:
         # the variable pair (i, j)
         self.constraints = {}
 
-        # counts total backtracks and failed backtracks 
-        self.backtrackCount = 0
-        self.backtrackFailedCount = 0
-
     def add_variable(self, name, domain):
         """Add a new variable to the CSP. 'name' is the variable name
         and 'domain' is a list of the legal values for the variable.
@@ -75,10 +71,14 @@ class CSP:
         """This functions starts the CSP solver and returns the found
         solution.
         """
+        # counts total backtracks and failed backtracks 
+        self.backtrack_count = 0
+        self.backtrack_failed_count = 0
         # Make a so-called "deep copy" of the dictionary containing the
         # domains of the CSP variables. The deep copy is required to
         # ensure that any changes made to 'assignment' does not have any
         # side effects elsewhere.
+
         assignment = copy.deepcopy(self.domains)
 
         # Run AC-3 on all constraints in the CSP, to weed out all of the
@@ -113,7 +113,6 @@ class CSP:
         iterations of the loop.
         """
         # TODO: IMPLEMENT THIS
-        self.backtrackCount += 1
         # Returns assignment if one of the variables have a value-list length > 1
         done = True
         for variable in assignment:
@@ -124,18 +123,18 @@ class CSP:
         # Find variable with size > 1 and iterate the values
         variable = self.select_unassigned_variable(assignment)
         for value in assignment[variable]:
+            self.backtrack_count += 1
             # Create a deep copy of assignment and adds value to variable
             assignment_copy = copy.deepcopy(assignment)
             assignment_copy[variable] = value
             if value in self.domains[variable]:
-                # Checking for arc consistency
-                inference = self.inference(assignment_copy, self.get_all_arcs())
-                if inference:
+                # Checking for arc consistency   
+                if self.inference(assignment_copy, self.get_all_arcs()):
                     result = self.backtrack(assignment_copy)
                     # Return result if complete
                     if result:
                         return result
-        self.backtrackFailedCount += 1
+        self.backtrack_failed_count += 1
         return False
 
     def select_unassigned_variable(self, assignment):
@@ -260,6 +259,6 @@ def main():
     csp = create_map_coloring_csp()
     sudoku = create_sudoku_csp("veryhard.txt")
     print_sudoku_solution(sudoku.backtracking_search())
-    print("backtrack count: ", sudoku.backtrackCount)
-    print("backtrack failed count: ", sudoku.backtrackFailedCount)
+    print("backtrack count: ", sudoku.backtrack_count)
+    print("backtrack failed count: ", sudoku.backtrack_failed_count)
 main()
