@@ -115,22 +115,23 @@ class CSP:
         # TODO: IMPLEMENT THIS
         self.backtrackCount += 1
         # Check if all the variables in 'assignment' have lists of length one
+        # Returns assignment if one of the variables have a value-list > 1
         complete = True
-        for value in assignment:
-            if len(assignment[value]) != 1:
+        for variable in assignment:
+            if len(assignment[variable]) > 1:
                 complete = False
         if complete:
             return assignment
         # Function for selecting a variable with a domain size greater than 1
-        var = self.select_unassigned_variable(assignment)
+        variable = self.select_unassigned_variable(assignment)
         # For each value of the possible values of var
-        for value in assignment[var]:
+        for value in assignment[variable]:
             # Create a deep copy of assignment
             assignment2 = copy.deepcopy(assignment)
             # Adds var = value to the assignment
-            assignment2[var] = value
+            assignment2[variable] = value
             # Checks if value is consistent with assignment
-            if value in self.domains[var]:
+            if value in self.domains[variable]:
                 # Calls AC-3 as inference to check for arc consistency
                 inferences = self.inference(assignment2, self.get_all_arcs())
                 # If the inference is not failure
@@ -138,7 +139,7 @@ class CSP:
                     # Recursive call to backtrack with reevaluated assignment
                     result = self.backtrack(assignment2)
                     # Return the result if it is complete
-                    if result is not False:
+                    if result != False:
                         return result
         self.backtrackFailedCount += 1
         return False
@@ -259,16 +260,16 @@ def print_sudoku_solution(solution):
     """
     for row in range(9):
         for col in range(9):
-            print(solution['%d-%d' % (row, col)][0]),
+            print(solution['%d-%d' % (row, col)][0], end=' '),
             if col == 2 or col == 5:
-                print('|'),
+                print('|', end=' '),
         print("")
         if row == 2 or row == 5:
             print('------+-------+------')
 
 def main():
     csp = create_map_coloring_csp()
-    sudoku = create_sudoku_csp("veryhard.txt")
+    sudoku = create_sudoku_csp("easy.txt")
     print_sudoku_solution(sudoku.backtracking_search())
     print("backtrack count: ", sudoku.backtrackCount)
     print("backtrack failed count: ", sudoku.backtrackFailedCount)
